@@ -4,12 +4,12 @@ export const getAll = async (req, res) => {
     try {
         const requests = await Richiesta.findAll({
             include: [
-                { model: Persona, attributes: ['nome', 'cognome'] },
-                { model: Ente, attributes: ['descrizione'] },
+                { model: Persona },
+                { model: Ente },
                 { model: StatoRichiesta, as: 'Stato' },
                 { model: TipoRichiesta, as: 'Tipo' },
                 { model: Allegato, as: 'Fototessera' },
-                { model: Allegato, as: 'FirmaScansionata'}
+                { model: Allegato, as: 'FirmaScansionata' }
             ],
             order: [['createdAt', 'DESC']]
         });
