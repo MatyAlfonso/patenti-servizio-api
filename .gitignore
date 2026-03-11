@@ -32,3 +32,6 @@ coverage
 
 #DB sqlite
 database.sqlite
+
+# Uploads
+uploads/
