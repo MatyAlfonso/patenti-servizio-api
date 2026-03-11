@@ -22,6 +22,10 @@ export const Richiesta = sequelize.define('Richiesta', {
     },
     codice_utente_responsabile: {
         type: DataTypes.STRING
+    },
+    numero_richiesta_ente: {
+        type: DataTypes.INTEGER,
+        allowNull: false
     }
 }, {
     tableName: 'Richieste'

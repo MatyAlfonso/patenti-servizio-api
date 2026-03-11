@@ -2,7 +2,7 @@ import { Richiesta, Persona, Ente, StatoRichiesta, TipoRichiesta, Allegato, sequ
 
 export const getAll = async (req, res) => {
     try {
-        const richieste = await Richiesta.findAll({
+        const requests = await Richiesta.findAll({
             include: [
                 { model: Persona, attributes: ['nome', 'cognome'] },
                 { model: Ente, attributes: ['descrizione'] },
@@ -12,7 +12,7 @@ export const getAll = async (req, res) => {
             ],
             order: [['createdAt', 'DESC']]
         });
-        res.json(richieste);
+        res.json(requests);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -23,10 +23,17 @@ export const create = async (req, res) => {
     try {
         const { id_persona, id_ente, id_tipo, id_stato, residenza_persona, note_richiedente } = req.body;
 
+        const ente = await Ente.findByPk(id_ente, { transaction });
+        if (!ente) throw new Error("Ente non trovato");
+
+        const newSq = (ente.sq_richieste || 0) + 1;
+
+        await ente.update({ sq_richieste: newSq }, { transaction });
+
         let id_foto = null;
         let id_firma = null;
 
-        if (req.files.fototessera) {
+        if (req.files && req.files.fototessera) {
             const foto = await Allegato.create({
                 nome_file: req.files.fototessera[0].originalname,
                 path: req.files.fototessera[0].path,
@@ -35,7 +42,7 @@ export const create = async (req, res) => {
             id_foto = foto.id;
         }
 
-        if (req.files.firma) {
+        if (req.files && req.files.firma) {
             const firma = await Allegato.create({
                 nome_file: req.files.firma[0].originalname,
                 path: req.files.firma[0].path,
@@ -44,7 +51,7 @@ export const create = async (req, res) => {
             id_firma = firma.id;
         }
 
-        const nuevaRichiesta = await Richiesta.create({
+        const newRequest = await Richiesta.create({
             data_richiesta: new Date(),
             id_persona,
             id_ente,
@@ -53,11 +60,12 @@ export const create = async (req, res) => {
             residenza_persona,
             note_richiedente,
             id_foto,
-            id_firma
+            id_firma,
+            numero_richiesta_ente: newSq
         }, { transaction });
 
         await transaction.commit();
-        res.status(201).json(nuevaRichiesta);
+        res.status(201).json(newRequest);
     } catch (error) {
         await transaction.rollback();
         res.status(500).json({ error: error.message });
