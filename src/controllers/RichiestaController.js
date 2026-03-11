@@ -32,19 +32,33 @@ export const create = async (req, res) => {
         const newSq = (ente.sq_richieste || 0) + 1;
         await ente.update({ sq_richieste: newSq }, { transaction });
 
-        await PatenteCivile.create({
-            id_persona: id_persona,
-            numero: patente_civile_numero,
-            data_rilascio: patente_civile_rilascio,
-            data_scadenza: patente_civile_scadenza,
-            id_categoria: patente_civile_categorie,
-            autorita: "MCTC"
-        }, { transaction });
+        const [patente, created] = await PatenteCivile.findOrCreate({
+            where: { id_persona: id_persona },
+            defaults: {
+                numero: patente_civile_numero,
+                data_rilascio: patente_civile_rilascio,
+                data_scadenza: patente_civile_scadenza,
+                id_categoria: patente_civile_categorie,
+                id_stato: 'ATTIVA',
+                autorita: "MCTC"
+            },
+            transaction
+        });
+
+        if (!created) {
+            await patente.update({
+                numero: patente_civile_numero,
+                data_rilascio: patente_civile_rilascio,
+                data_scadenza: patente_civile_scadenza,
+                id_categoria: patente_civile_categorie,
+                autorita: "MCTC"
+            }, { transaction });
+        }
 
         let id_foto = null;
         let id_firma = null;
 
-        if (req.files && req.files.fototessera) {
+        if (req.files?.fototessera) {
             const foto = await Allegato.create({
                 nome_file: req.files.fototessera[0].originalname,
                 path: req.files.fototessera[0].path,
@@ -53,7 +67,7 @@ export const create = async (req, res) => {
             id_foto = foto.id;
         }
 
-        if (req.files && req.files.firma) {
+        if (req.files?.firma) {
             const firma = await Allegato.create({
                 nome_file: req.files.firma[0].originalname,
                 path: req.files.firma[0].path,
@@ -78,7 +92,7 @@ export const create = async (req, res) => {
         await transaction.commit();
         res.status(201).json(newRequest);
     } catch (error) {
-        await transaction.rollback();
+        if (transaction) await transaction.rollback();
         res.status(500).json({ error: error.message });
     }
 };
