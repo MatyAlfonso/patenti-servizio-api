@@ -1,4 +1,4 @@
-import { Richiesta, Persona, Ente, StatoRichiesta, TipoRichiesta, Allegato, sequelize } from '../models/index.js';
+import { Richiesta, Persona, Ente, StatoRichiesta, TipoRichiesta, Allegato, PatenteCivile, sequelize } from '../models/index.js';
 
 export const getAll = async (req, res) => {
     try {
@@ -21,14 +21,24 @@ export const getAll = async (req, res) => {
 export const create = async (req, res) => {
     const transaction = await sequelize.transaction();
     try {
-        const { id_persona, id_ente, id_tipo, id_stato, residenza_persona, note_richiedente } = req.body;
+        const {
+            id_persona, id_ente, id_tipo, id_stato, residenza_persona, note_richiedente,
+            patente_civile_numero, patente_civile_categorie, patente_civile_rilascio, patente_civile_scadenza
+        } = req.body;
 
         const ente = await Ente.findByPk(id_ente, { transaction });
         if (!ente) throw new Error("Ente non trovato");
-
         const newSq = (ente.sq_richieste || 0) + 1;
-
         await ente.update({ sq_richieste: newSq }, { transaction });
+
+        await PatenteCivile.create({
+            id_persona: id_persona,
+            numero: patente_civile_numero,
+            data_rilascio: patente_civile_rilascio,
+            data_scadenza: patente_civile_scadenza,
+            id_categoria: patente_civile_categorie,
+            autorita: "MCTC"
+        }, { transaction });
 
         let id_foto = null;
         let id_firma = null;
