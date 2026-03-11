@@ -36,8 +36,8 @@ PatenteServizio.belongsTo(StatoPatente, { foreignKey: 'id_stato' });
 PatenteServizio.belongsTo(Allegato, { as: 'Foto', foreignKey: 'id_foto' });
 PatenteServizio.belongsTo(Allegato, { as: 'Firma', foreignKey: 'id_firma' });
 
-Richiesta.belongsTo(TipoRichiesta, { foreignKey: 'id_tipo' });
-Richiesta.belongsTo(StatoRichiesta, { foreignKey: 'id_stato' });
+Richiesta.belongsTo(TipoRichiesta, { foreignKey: 'id_tipo', as: 'Tipo' });
+Richiesta.belongsTo(StatoRichiesta, { foreignKey: 'id_stato', as: 'Stato' });
 Richiesta.belongsTo(Allegato, { as: 'Fototessera', foreignKey: 'id_foto' });
 Richiesta.belongsTo(Allegato, { as: 'FirmaScansionata', foreignKey: 'id_firma' });
 

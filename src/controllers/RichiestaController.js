@@ -6,8 +6,8 @@ export const getAll = async (req, res) => {
             include: [
                 { model: Persona, attributes: ['nome', 'cognome'] },
                 { model: Ente, attributes: ['descrizione'] },
-                { model: StatoRichiesta },
-                { model: TipoRichiesta },
+                { model: StatoRichiesta, as: 'Stato' },
+                { model: TipoRichiesta, as: 'Tipo' },
                 { model: Allegato, as: 'Fototessera' }
             ],
             order: [['createdAt', 'DESC']]
