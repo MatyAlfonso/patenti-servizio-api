@@ -8,7 +8,8 @@ export const getAll = async (req, res) => {
                 { model: Ente, attributes: ['descrizione'] },
                 { model: StatoRichiesta, as: 'Stato' },
                 { model: TipoRichiesta, as: 'Tipo' },
-                { model: Allegato, as: 'Fototessera' }
+                { model: Allegato, as: 'Fototessera' },
+                { model: Allegato, as: 'FirmaScansionata'}
             ],
             order: [['createdAt', 'DESC']]
         });
