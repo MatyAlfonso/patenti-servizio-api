@@ -96,3 +96,32 @@ export const create = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+export const update = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { id_stato } = req.body;
+
+        const richiesta = await Richiesta.findByPk(id);
+
+        if (!richiesta) {
+            return res.status(404).json({ error: "Richiesta non trovata" });
+        }
+
+        if (richiesta.id_stato !== 'IN_PREPARAZIONE' && id_stato === 'RESPINTA') {
+            return res.status(400).json({ error: "Non è possibile respingere una richiesta già elaborata" });
+        }
+
+        await richiesta.update({ id_stato });
+
+        const updatedRequest = await Richiesta.findByPk(id, {
+            include: [
+                { model: StatoRichiesta, as: 'stato' }
+            ]
+        });
+
+        res.json(updatedRequest);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
