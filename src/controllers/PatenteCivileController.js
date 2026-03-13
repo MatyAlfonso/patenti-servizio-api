@@ -1,4 +1,4 @@
-import { PatenteCivile, Persona, CategoriaPatente, StatoPatente } from '../models/index.js';
+import { PatenteCivile, Persona, CategoriaPatente, StatoPatente, PatenteServizio, sequelize } from '../models/index.js';
 
 export const getAll = async (req, res) => {
     try {
@@ -6,14 +6,17 @@ export const getAll = async (req, res) => {
             include: [
                 {
                     model: Persona,
+                    as: 'persona',
                     attributes: ['nome', 'cognome']
                 },
                 {
                     model: CategoriaPatente,
+                    as: 'categoria',
                     attributes: ['id', 'descrizione']
                 },
                 {
                     model: StatoPatente,
+                    as: 'stato',
                     attributes: ['id', 'descrizione']
                 }
             ],
@@ -31,5 +34,37 @@ export const create = async (req, res) => {
         res.status(201).json(newLicense);
     } catch (error) {
         res.status(400).json({ error: error.message });
+    }
+};
+
+export const update = async (req, res) => {
+    const transaction = await sequelize.transaction();
+    try {
+        const { id } = req.params;
+        const { id_stato } = req.body;
+
+        const patenteCivile = await PatenteCivile.findByPk(id);
+        if (!patenteCivile) throw new Error("Patente civile non trovata");
+
+        await patenteCivile.update({ id_stato }, { transaction });
+
+        if (id_stato !== 'ATTIVA') {
+            await PatenteServizio.update(
+                {
+                    id_stato: 'SOSPESA',
+                    note: `Inabilitata automaticamente: patente civile in stato ${id_stato}`
+                },
+                {
+                    where: { id_persona: patenteCivile.id_persona, id_stato: 'ATTIVA' },
+                    transaction
+                }
+            );
+        }
+
+        await transaction.commit();
+        res.json({ message: "Stato aggiornato e dipendenze verificate" });
+    } catch (error) {
+        if (transaction) await transaction.rollback();
+        res.status(500).json({ error: error.message });
     }
 };
