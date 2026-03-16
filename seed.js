@@ -10,7 +10,6 @@ const seed = async () => {
             { id: 'C', descrizione: 'Camion e mezzi pesanti' },
             { id: 'D', descrizione: 'Autobus e mezzi trasporto persone' },
             { id: 'E', descrizione: 'Rimorchi pesanti' },
-            { id: 'CIGC', descrizione: 'Certificato idoneità guida ciclomotori' }
         ];
         await CategoriaPatente.bulkCreate(categories, { ignoreDuplicates: true });
 
@@ -18,7 +17,7 @@ const seed = async () => {
             { id: 'ANNULLATA', descrizione: 'Annullata' },
             { id: 'ATTIVA', descrizione: 'Attiva' },
             { id: 'IN_PREPARAZIONE', descrizione: 'In preparazione' },
-            { id: 'REVOCATA', descrizione: 'REVOCATA' },
+            { id: 'REVOCATA', descrizione: 'Revocata' },
             { id: 'SCADUTA', descrizione: 'Scaduta' },
             { id: 'RUBATA', descrizione: 'Rubata' },
             { id: 'SMARRITA', descrizione: 'Smarrita' },

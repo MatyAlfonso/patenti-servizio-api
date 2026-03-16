@@ -6,18 +6,15 @@ export const getAll = async (req, res) => {
             include: [
                 {
                     model: Persona,
-                    as: 'persona',
-                    attributes: ['nome', 'cognome']
+                    as: 'persona'
                 },
                 {
                     model: CategoriaPatente,
-                    as: 'categoria',
-                    attributes: ['id', 'descrizione']
+                    as: 'categoria'
                 },
                 {
                     model: StatoPatente,
-                    as: 'stato',
-                    attributes: ['id', 'descrizione']
+                    as: 'stato'
                 }
             ],
             order: [['data_scadenza', 'ASC']]
