@@ -70,9 +70,9 @@ export const generateLicenseBuffer = async (request) => {
             
             { text: civilLicense?.numero || '', absolutePosition: { x: frontBoxes['5a'].l, y: frontBoxes['5a'].t }, fontSize: 7 },
             
-            { text: request.numero, absolutePosition: { x: frontBoxes['5b'].l, y: frontBoxes['5b'].t }, fontSize: 7, bold: true },
+            { text: request.numero, absolutePosition: { x: frontBoxes['5b'].l, y: frontBoxes['5b'].t }, fontSize: 7 },
             
-            { text: request.id_categoria || '', absolutePosition: { x: frontBoxes['9'].l, y: frontBoxes['9'].t }, fontSize: 7, bold: true },
+            { text: request.id_categoria || '', absolutePosition: { x: frontBoxes['9'].l, y: frontBoxes['9'].t }, fontSize: 7 },
 
             holderPhoto ? {
                 image: holderPhoto,
