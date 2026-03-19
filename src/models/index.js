@@ -33,8 +33,8 @@ PatenteCivile.belongsTo(StatoPatente, { foreignKey: 'id_stato', as: 'stato' });
 
 PatenteServizio.belongsTo(CategoriaPatente, { foreignKey: 'id_categoria', as: 'categoria' });
 PatenteServizio.belongsTo(StatoPatente, { foreignKey: 'id_stato', as: 'stato' });
-PatenteServizio.belongsTo(Allegato, { foreignKey: 'id_foto', as: 'foto' });
-PatenteServizio.belongsTo(Allegato, { foreignKey: 'id_firma', as: 'firma' });
+PatenteServizio.belongsTo(Allegato, { foreignKey: 'id_foto', as: 'fototessera' });
+PatenteServizio.belongsTo(Allegato, { foreignKey: 'id_firma', as: 'firma_scansionata' });
 
 Richiesta.belongsTo(TipoRichiesta, { foreignKey: 'id_tipo', as: 'tipo' });
 Richiesta.belongsTo(StatoRichiesta, { foreignKey: 'id_stato', as: 'stato' });
