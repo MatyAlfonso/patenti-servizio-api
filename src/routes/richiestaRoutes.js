@@ -1,11 +1,13 @@
 import { Router } from 'express';
-import { getAll, create, update } from '../controllers/RichiestaController.js';
+import { getAll, create, update, generatePDF } from '../controllers/RichiestaController.js';
 import { issue } from '../controllers/PatenteServizioController.js';
 import { upload } from '../middlewares/upload.js';
 
 const router = Router();
 
 router.get('/', getAll);
+
+router.get('/:id/pdf', generatePDF);
 
 router.post('/', upload.fields([
     { name: 'fototessera', maxCount: 1 },
