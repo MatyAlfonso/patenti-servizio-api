@@ -131,22 +131,24 @@ export const generatePDF = async (req, res) => {
     try {
         const { id } = req.params;
         const richiesta = await Richiesta.findByPk(id);
-        
+
         if (!richiesta) return res.status(404).json({ error: "Richiesta non trovata" });
 
         const patente = await PatenteServizio.findOne({
-            where: { 
+            where: {
                 id_persona: richiesta.id_persona,
                 id_ente: richiesta.id_ente,
+                id_foto: richiesta.id_foto,
+                id_firma: richiesta.id_firma,
                 id_stato: 'ATTIVA'
             },
             include: [
-                { 
-                    model: Persona, 
-                    as: 'persona', 
-                    include: [{ model: PatenteCivile, as: 'patente_civile' }] 
+                {
+                    model: Persona,
+                    as: 'persona',
+                    include: [{ model: PatenteCivile, as: 'patente_civile' }]
                 },
-                { model: Allegato, as: 'fototessera' }, 
+                { model: Allegato, as: 'fototessera' },
                 { model: Allegato, as: 'firma_scansionata' }
             ]
         });

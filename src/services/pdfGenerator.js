@@ -37,8 +37,15 @@ export const generateLicenseBuffer = async (request) => {
 
     const imgToBase64 = (filePath) => {
         if (!filePath) return null;
-        const fullPath = path.resolve(filePath);
-        if (!fs.existsSync(fullPath)) return null;
+        const fullPath = path.isAbsolute(filePath)
+            ? filePath
+            : path.resolve(process.cwd(), filePath);
+
+        if (!fs.existsSync(fullPath)) {
+            console.error("File not found:", fullPath);
+            return null;
+        }
+
         return `data:image/jpeg;base64,${fs.readFileSync(fullPath).toString('base64')}`;
     };
 
