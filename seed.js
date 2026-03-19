@@ -5,11 +5,12 @@ const seed = async () => {
         await sequelize.sync();
 
         const categories = [
-            { id: 'A', descrizione: 'Motocicli' },
-            { id: 'B', descrizione: 'Autoveicoli fino a 3.5t' },
-            { id: 'C', descrizione: 'Camion e mezzi pesanti' },
-            { id: 'D', descrizione: 'Autobus e mezzi trasporto persone' },
-            { id: 'E', descrizione: 'Rimorchi pesanti' },
+            { id: 'I', descrizione: 'Patente B' },
+            { id: 'I IV', descrizione: 'Patente BE' },
+            { id: 'II', descrizione: 'Patente C' },
+            { id: 'II IV', descrizione: 'Patente CE' },
+            { id: 'III', descrizione: 'Patente D' },
+            { id: 'III IV', descrizione: 'Patente DE' },
         ];
         await CategoriaPatente.bulkCreate(categories, { ignoreDuplicates: true });
 
