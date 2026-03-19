@@ -15,22 +15,22 @@ const fonts = {
 const printer = new PdfPrinter(fonts);
 
 const frontBoxes = {
-    '1': { t: 43.5, l: 77.5 },  // Cognome
-    '2': { t: 57.5, l: 77.5 },  // Nome
-    '3': { t: 71.5, l: 77.5 },  //  Data e luogo di nascita
-    '4a': { t: 86.0, l: 77.5 },  // Data di rilascio
-    '4b': { t: 100.5, l: 77.5 }, // Data di scadenza
-    '4c': { t: 86.0, l: 170.0 }, // Autorità
-    '5a': { t: 100.5, l: 170.0 }, // Numero patente civile
-    '7': { t: 115.0, l: 82.5 },  // Firma
-    '5b': { t: 129.0, l: 77.5 },  // Numero patente di servizio
-    '9': { t: 129.0, l: 32.5 },  // Categoria
+    '1': { t: 42, l: 77.5 },  // Cognome
+    '2': { t: 56, l: 77.5 },  // Nome
+    '3': { t: 70, l: 77.5 },  //  Data e luogo di nascita
+    '4a': { t: 85, l: 77.5 },  // Data di rilascio
+    '4b': { t: 100, l: 77.5 }, // Data di scadenza
+    '4c': { t: 85, l: 170.0 }, // Autorità
+    '5a': { t: 99, l: 170.0 }, // Numero patente civile
+    '7': { t: 112, l: 82.5 },  // Firma
+    '5b': { t: 128, l: 77.5 },  // Numero patente di servizio
+    '9': { t: 128, l: 35 },  // Categoria
     'photo': { t: 45.0, l: 4.0, w: 55.0, h: 67.5 } // Foto
 };
 
 const backBoxes = {
-    'I_10': { t: 20, l: 140 },
-    'I_11': { t: 20, l: 190 },
+    'I_10': { t: 20, l: 132 },
+    'I_11': { t: 20, l: 185 },
 };
 
 export const generateLicenseBuffer = async (request) => {
@@ -63,23 +63,23 @@ export const generateLicenseBuffer = async (request) => {
         content: [
             { image: frontBackground, width: 242.6, absolutePosition: { x: 0, y: 0 } },
 
-            { text: request.persona.cognome.toUpperCase(), absolutePosition: { x: frontBoxes['1'].l, y: frontBoxes['1'].t }, fontSize: 7 },
+            { text: request.persona.cognome.toUpperCase(), absolutePosition: { x: frontBoxes['1'].l, y: frontBoxes['1'].t }, fontSize: 9 },
 
-            { text: request.persona.nome.toUpperCase(), absolutePosition: { x: frontBoxes['2'].l, y: frontBoxes['2'].t }, fontSize: 7 },
+            { text: request.persona.nome.toUpperCase(), absolutePosition: { x: frontBoxes['2'].l, y: frontBoxes['2'].t }, fontSize: 9 },
 
-            { text: `${new Date(request.persona.data_nascita).toLocaleDateString('it-IT')} - ${request.persona.luogo_nascita.toUpperCase()}`, absolutePosition: { x: frontBoxes['3'].l, y: frontBoxes['3'].t }, fontSize: 7 },
+            { text: `${new Date(request.persona.data_nascita).toLocaleDateString('it-IT')} ${request.persona.luogo_nascita.toUpperCase()}`, absolutePosition: { x: frontBoxes['3'].l, y: frontBoxes['3'].t }, fontSize: 9 },
 
-            { text: new Date(request.data_rilascio).toLocaleDateString('it-IT'), absolutePosition: { x: frontBoxes['4a'].l, y: frontBoxes['4a'].t }, fontSize: 7 },
+            { text: new Date(request.data_rilascio).toLocaleDateString('it-IT'), absolutePosition: { x: frontBoxes['4a'].l, y: frontBoxes['4a'].t }, fontSize: 9 },
 
-            { text: new Date(civilLicense.data_scadenza).toLocaleDateString('it-IT'), absolutePosition: { x: frontBoxes['4b'].l, y: frontBoxes['4b'].t }, fontSize: 7 },
+            { text: new Date(civilLicense.data_scadenza).toLocaleDateString('it-IT'), absolutePosition: { x: frontBoxes['4b'].l, y: frontBoxes['4b'].t }, fontSize: 9 },
 
-            { text: civilLicense?.autorita?.toUpperCase(), absolutePosition: { x: frontBoxes['4c'].l, y: frontBoxes['4c'].t }, fontSize: 7 },
+            { text: civilLicense?.autorita?.toUpperCase(), absolutePosition: { x: frontBoxes['4c'].l, y: frontBoxes['4c'].t }, fontSize: 9 },
 
-            { text: civilLicense?.numero || '', absolutePosition: { x: frontBoxes['5a'].l, y: frontBoxes['5a'].t }, fontSize: 7 },
+            { text: civilLicense?.numero || '', absolutePosition: { x: frontBoxes['5a'].l, y: frontBoxes['5a'].t }, fontSize: 9 },
 
-            { text: request.numero, absolutePosition: { x: frontBoxes['5b'].l, y: frontBoxes['5b'].t }, fontSize: 7 },
+            { text: request.numero, absolutePosition: { x: frontBoxes['5b'].l, y: frontBoxes['5b'].t }, fontSize: 9 },
 
-            { text: request.id_categoria || '', absolutePosition: { x: frontBoxes['9'].l, y: frontBoxes['9'].t }, fontSize: 7 },
+            { text: request.id_categoria || '', absolutePosition: { x: frontBoxes['9'].l, y: frontBoxes['9'].t }, fontSize: 9 },
 
             holderPhoto ? {
                 image: holderPhoto,
@@ -96,9 +96,9 @@ export const generateLicenseBuffer = async (request) => {
 
             { image: backBackground, width: 242.6, absolutePosition: { x: 0, y: 0 }, pageBreak: 'before' },
 
-            { text: new Date(request.data_rilascio).toLocaleDateString('it-IT'), absolutePosition: { x: backBoxes['I_10'].l, y: backBoxes['I_10'].t }, fontSize: 7 },
+            { text: new Date(request.data_rilascio).toLocaleDateString('it-IT'), absolutePosition: { x: backBoxes['I_10'].l, y: backBoxes['I_10'].t }, fontSize: 9 },
 
-            { text: new Date(civilLicense.data_scadenza).toLocaleDateString('it-IT'), absolutePosition: { x: backBoxes['I_11'].l, y: backBoxes['I_11'].t }, fontSize: 7 }
+            { text: new Date(civilLicense.data_scadenza).toLocaleDateString('it-IT'), absolutePosition: { x: backBoxes['I_11'].l, y: backBoxes['I_11'].t }, fontSize: 9 }
         ]
     };
 
