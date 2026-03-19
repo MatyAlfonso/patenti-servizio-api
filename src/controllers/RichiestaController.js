@@ -1,4 +1,5 @@
-import { Richiesta, Persona, Ente, StatoRichiesta, TipoRichiesta, Allegato, PatenteCivile, sequelize } from '../models/index.js';
+import { Richiesta, Persona, Ente, StatoRichiesta, TipoRichiesta, Allegato, PatenteCivile, PatenteServizio, sequelize } from '../models/index.js';
+import { generateLicenseBuffer } from '../services/pdfGenerator.js';
 
 export const getAll = async (req, res) => {
     try {
@@ -24,7 +25,7 @@ export const create = async (req, res) => {
     try {
         const {
             id_persona, id_ente, id_tipo, id_stato, residenza_persona, note_richiedente,
-            patente_civile_numero, patente_civile_categorie, patente_civile_rilascio, patente_civile_scadenza
+            patente_civile_numero, patente_civile_categorie, patente_civile_autorita, patente_civile_rilascio, patente_civile_scadenza
         } = req.body;
 
         const ente = await Ente.findByPk(id_ente, { transaction });
@@ -40,7 +41,7 @@ export const create = async (req, res) => {
                 data_scadenza: patente_civile_scadenza,
                 id_categoria: patente_civile_categorie,
                 id_stato: 'ATTIVA',
-                autorita: "MCTC"
+                autorita: patente_civile_autorita
             },
             transaction
         });
@@ -51,7 +52,7 @@ export const create = async (req, res) => {
                 data_rilascio: patente_civile_rilascio,
                 data_scadenza: patente_civile_scadenza,
                 id_categoria: patente_civile_categorie,
-                autorita: "MCTC"
+                autorita: patente_civile_autorita
             }, { transaction });
         }
 
@@ -121,6 +122,41 @@ export const update = async (req, res) => {
         });
 
         res.json(updatedRequest);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+export const generatePDF = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const richiesta = await Richiesta.findByPk(id);
+        
+        if (!richiesta) return res.status(404).json({ error: "Richiesta non trovata" });
+
+        const patente = await PatenteServizio.findOne({
+            where: { 
+                id_persona: richiesta.id_persona,
+                id_ente: richiesta.id_ente,
+                id_stato: 'ATTIVA'
+            },
+            include: [
+                { 
+                    model: Persona, 
+                    as: 'persona', 
+                    include: [{ model: PatenteCivile, as: 'patente_civile' }] 
+                },
+                { model: Allegato, as: 'fototessera' }, 
+                { model: Allegato, as: 'firma_scansionata' }
+            ]
+        });
+
+        if (!patente) return res.status(404).json({ error: "Patente non emessa per questa richiesta" });
+
+        const buffer = await generateLicenseBuffer(patente);
+
+        res.setHeader('Content-Type', 'application/pdf');
+        res.send(buffer);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
