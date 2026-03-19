@@ -35,3 +35,4 @@ database.sqlite
 
 # Uploads
 uploads/
+src/assets/templates
