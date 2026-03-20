@@ -29,8 +29,29 @@ const frontBoxes = {
 };
 
 const backBoxes = {
+    // Categoría I
     'I_10': { t: 20, l: 132 },
     'I_11': { t: 20, l: 185 },
+
+    // Categoría I IV
+    'I_IV_10': { t: 37, l: 132 },
+    'I_IV_11': { t: 37, l: 185 },
+
+    // Categoría II
+    'II_10': { t: 54, l: 132 },
+    'II_11': { t: 54, l: 185 },
+
+    // Categoría II IV
+    'II_IV_10': { t: 72, l: 132 },
+    'II_IV_11': { t: 72, l: 185},
+
+    // Categoría III
+    'III_10': { t: 89, l: 132 },
+    'III_11': { t: 89, l: 185 },
+
+    // Categoría III IV
+    'III_IV_10': { t: 106, l: 132 },
+    'III_IV_11': { t: 106, l: 185 },
 };
 
 export const generateLicenseBuffer = async (request) => {
@@ -48,6 +69,9 @@ export const generateLicenseBuffer = async (request) => {
 
         return `data:image/jpeg;base64,${fs.readFileSync(fullPath).toString('base64')}`;
     };
+
+    const coords10 = backBoxes[`${request.id_categoria}_10`];
+    const coords11 = backBoxes[`${request.id_categoria}_11`];
 
     const frontBackground = imgToBase64(path.join(__dirname, '../assets/templates/Fronte_finale.jpg'));
     const backBackground = imgToBase64(path.join(__dirname, '../assets/templates/Retro_finale.jpg'));
@@ -96,9 +120,9 @@ export const generateLicenseBuffer = async (request) => {
 
             { image: backBackground, width: 242.6, absolutePosition: { x: 0, y: 0 }, pageBreak: 'before' },
 
-            { text: new Date(request.data_rilascio).toLocaleDateString('it-IT'), absolutePosition: { x: backBoxes['I_10'].l, y: backBoxes['I_10'].t }, fontSize: 9 },
+            { text: new Date(request.data_rilascio).toLocaleDateString('it-IT'), absolutePosition: { x: coords10.l, y: coords10.t }, fontSize: 9 },
 
-            { text: new Date(civilLicense.data_scadenza).toLocaleDateString('it-IT'), absolutePosition: { x: backBoxes['I_11'].l, y: backBoxes['I_11'].t }, fontSize: 9 }
+            { text: new Date(civilLicense.data_scadenza).toLocaleDateString('it-IT'), absolutePosition: { x: coords11.l, y: coords11.t }, fontSize: 9 }
         ]
     };
 

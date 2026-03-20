@@ -6,11 +6,11 @@ const seed = async () => {
 
         const categories = [
             { id: 'I', descrizione: 'Patente B' },
-            { id: 'I IV', descrizione: 'Patente BE' },
+            { id: 'I_IV', descrizione: 'Patente BE' },
             { id: 'II', descrizione: 'Patente C' },
-            { id: 'II IV', descrizione: 'Patente CE' },
+            { id: 'II_IV', descrizione: 'Patente CE' },
             { id: 'III', descrizione: 'Patente D' },
-            { id: 'III IV', descrizione: 'Patente DE' },
+            { id: 'III_IV', descrizione: 'Patente DE' },
         ];
         await CategoriaPatente.bulkCreate(categories, { ignoreDuplicates: true });
 
