@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getAll, create, update, generatePDF } from '../controllers/RichiestaController.js';
+import { getAll, create, update, generatePDF, remove } from '../controllers/RichiestaController.js';
 import { issue } from '../controllers/PatenteServizioController.js';
 import { upload } from '../middlewares/upload.js';
 
@@ -16,6 +16,11 @@ router.post('/', upload.fields([
 
 router.post('/:id', issue);
 
-router.patch('/:id', update);
+router.patch('/:id', upload.fields([
+    { name: 'fototessera', maxCount: 1 },
+    { name: 'firma', maxCount: 1 }
+]), update);
+
+router.delete('/:id', remove);
 
 export default router;
