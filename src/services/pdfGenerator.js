@@ -43,7 +43,7 @@ const backBoxes = {
 
     // Categoría II IV
     'II_IV_10': { t: 72, l: 132 },
-    'II_IV_11': { t: 72, l: 185},
+    'II_IV_11': { t: 72, l: 185 },
 
     // Categoría III
     'III_10': { t: 89, l: 132 },
@@ -53,6 +53,12 @@ const backBoxes = {
     'III_IV_10': { t: 106, l: 132 },
     'III_IV_11': { t: 106, l: 185 },
 };
+
+const badgeWidth = 8.602 * 28.35;
+const badgeHeight = 5.486 * 28.35;
+const safeMargin = 10;
+
+const pos = (box, isY = false) => (isY ? box.t : box.l) + safeMargin;
 
 export const generateLicenseBuffer = async (request) => {
 
@@ -82,47 +88,63 @@ export const generateLicenseBuffer = async (request) => {
     const civilLicense = request.persona.patente_civile[0];
 
     const docDefinition = {
-        pageSize: { width: 242.6, height: 153 },
-        pageMargins: [0, 0, 0, 0],
+        pageSize: {
+            width: badgeWidth + (safeMargin * 2),
+            height: badgeHeight + (safeMargin * 2)
+        },
+        pageMargins: [safeMargin, safeMargin, safeMargin, safeMargin],
         content: [
-            { image: frontBackground, width: 242.6, absolutePosition: { x: 0, y: 0 } },
+            // --- FRONTE ---
+            {
+                image: frontBackground,
+                width: badgeWidth,
+                height: badgeHeight,
+                absolutePosition: { x: safeMargin, y: safeMargin }
+            },
 
-            { text: request.persona.cognome.toUpperCase(), absolutePosition: { x: frontBoxes['1'].l, y: frontBoxes['1'].t }, fontSize: 9 },
+            { text: request.persona.cognome.toUpperCase(), absolutePosition: { x: pos(frontBoxes['1']), y: pos(frontBoxes['1'], true) }, fontSize: 9 },
 
-            { text: request.persona.nome.toUpperCase(), absolutePosition: { x: frontBoxes['2'].l, y: frontBoxes['2'].t }, fontSize: 9 },
+            { text: request.persona.nome.toUpperCase(), absolutePosition: { x: pos(frontBoxes['2']), y: pos(frontBoxes['2'], true) }, fontSize: 9 },
 
-            { text: `${new Date(request.persona.data_nascita).toLocaleDateString('it-IT')} ${request.persona.luogo_nascita.toUpperCase()}`, absolutePosition: { x: frontBoxes['3'].l, y: frontBoxes['3'].t }, fontSize: 9 },
+            { text: `${new Date(request.persona.data_nascita).toLocaleDateString('it-IT')} ${request.persona.luogo_nascita.toUpperCase()}`, absolutePosition: { x: pos(frontBoxes['3']), y: pos(frontBoxes['3'], true) }, fontSize: 9 },
 
-            { text: new Date(request.data_rilascio).toLocaleDateString('it-IT'), absolutePosition: { x: frontBoxes['4a'].l, y: frontBoxes['4a'].t }, fontSize: 9 },
+            { text: new Date(request.data_rilascio).toLocaleDateString('it-IT'), absolutePosition: { x: pos(frontBoxes['4a']), y: pos(frontBoxes['4a'], true) }, fontSize: 9 },
 
-            { text: new Date(civilLicense.data_scadenza).toLocaleDateString('it-IT'), absolutePosition: { x: frontBoxes['4b'].l, y: frontBoxes['4b'].t }, fontSize: 9 },
+            { text: new Date(civilLicense.data_scadenza).toLocaleDateString('it-IT'), absolutePosition: { x: pos(frontBoxes['4b']), y: pos(frontBoxes['4b'], true) }, fontSize: 9 },
 
-            { text: civilLicense?.autorita?.toUpperCase(), absolutePosition: { x: frontBoxes['4c'].l, y: frontBoxes['4c'].t }, fontSize: 9 },
+            { text: civilLicense?.autorita?.toUpperCase(), absolutePosition: { x: pos(frontBoxes['4c']), y: pos(frontBoxes['4c'], true) }, fontSize: 9 },
 
-            { text: civilLicense?.numero || '', absolutePosition: { x: frontBoxes['5a'].l, y: frontBoxes['5a'].t }, fontSize: 9 },
+            { text: civilLicense?.numero || '', absolutePosition: { x: pos(frontBoxes['5a']), y: pos(frontBoxes['5a'], true) }, fontSize: 9 },
 
-            { text: request.numero, absolutePosition: { x: frontBoxes['5b'].l, y: frontBoxes['5b'].t }, fontSize: 9 },
+            { text: request.numero, absolutePosition: { x: pos(frontBoxes['5b']), y: pos(frontBoxes['5b'], true) }, fontSize: 9 },
 
-            { text: request.id_categoria || '', absolutePosition: { x: frontBoxes['9'].l, y: frontBoxes['9'].t }, fontSize: 9 },
+            { text: request.id_categoria || '', absolutePosition: { x: pos(frontBoxes['9']), y: pos(frontBoxes['9'], true) }, fontSize: 9 },
 
             holderPhoto ? {
                 image: holderPhoto,
                 width: frontBoxes.photo.w,
                 height: frontBoxes.photo.h,
-                absolutePosition: { x: frontBoxes.photo.l, y: frontBoxes.photo.t }
+                absolutePosition: { x: pos(frontBoxes.photo), y: pos(frontBoxes.photo, true) }
             } : {},
 
             holderSignature ? {
                 image: holderSignature,
                 width: 40,
-                absolutePosition: { x: frontBoxes['7'].l, y: frontBoxes['7'].t }
+                absolutePosition: { x: pos(frontBoxes['7']), y: pos(frontBoxes['7'], true) }
             } : {},
 
-            { image: backBackground, width: 242.6, absolutePosition: { x: 0, y: 0 }, pageBreak: 'before' },
+            // --- RETRO ---
+            {
+                image: backBackground,
+                width: badgeWidth,
+                height: badgeHeight,
+                absolutePosition: { x: safeMargin, y: safeMargin },
+                pageBreak: 'before'
+            },
 
-            { text: new Date(request.data_rilascio).toLocaleDateString('it-IT'), absolutePosition: { x: coords10.l, y: coords10.t }, fontSize: 9 },
+            { text: new Date(request.data_rilascio).toLocaleDateString('it-IT'), absolutePosition: { x: pos(coords10), y: pos(coords10, true) }, fontSize: 9 },
 
-            { text: new Date(civilLicense.data_scadenza).toLocaleDateString('it-IT'), absolutePosition: { x: coords11.l, y: coords11.t }, fontSize: 9 }
+            { text: new Date(civilLicense.data_scadenza).toLocaleDateString('it-IT'), absolutePosition: { x: pos(coords11), y: pos(coords11, true) }, fontSize: 9 }
         ]
     };
 
