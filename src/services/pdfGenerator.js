@@ -56,9 +56,8 @@ const backBoxes = {
 
 const badgeWidth = 8.602 * 28.35;
 const badgeHeight = 5.486 * 28.35;
-const safeMargin = 10;
 
-const pos = (box, isY = false) => (isY ? box.t : box.l) + safeMargin;
+const pos = (box, isY = false) => (isY ? box.t : box.l);
 
 export const generateLicenseBuffer = async (request) => {
 
@@ -89,17 +88,17 @@ export const generateLicenseBuffer = async (request) => {
 
     const docDefinition = {
         pageSize: {
-            width: badgeWidth + (safeMargin * 2),
-            height: badgeHeight + (safeMargin * 2)
+            width: badgeWidth,
+            height: badgeHeight
         },
-        pageMargins: [safeMargin, safeMargin, safeMargin, safeMargin],
+        pageMargins: 0,
         content: [
             // --- FRONTE ---
             {
                 image: frontBackground,
                 width: badgeWidth,
                 height: badgeHeight,
-                absolutePosition: { x: safeMargin, y: safeMargin }
+                absolutePosition: { x: 0, y: 0 }
             },
 
             { text: request.persona.cognome.toUpperCase(), absolutePosition: { x: pos(frontBoxes['1']), y: pos(frontBoxes['1'], true) }, fontSize: 9 },
@@ -138,7 +137,7 @@ export const generateLicenseBuffer = async (request) => {
                 image: backBackground,
                 width: badgeWidth,
                 height: badgeHeight,
-                absolutePosition: { x: safeMargin, y: safeMargin },
+                absolutePosition: { x: 0, y: 0 },
                 pageBreak: 'before'
             },
 
