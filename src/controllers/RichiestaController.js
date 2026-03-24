@@ -119,6 +119,7 @@ export const update = async (req, res) => {
         await request.update({
             id_ente: data.id_ente,
             id_tipo: data.id_tipo,
+            id_stato: data.id_stato,
             residenza_persona: data.residenza_persona,
             note_richiedente: data.note_richiedente
         }, { transaction });
