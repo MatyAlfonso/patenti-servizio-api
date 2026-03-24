@@ -15,49 +15,47 @@ const fonts = {
 const printer = new PdfPrinter(fonts);
 
 const frontBoxes = {
-    '1': { t: 42, l: 77.5 },  // Cognome
-    '2': { t: 56, l: 77.5 },  // Nome
-    '3': { t: 70, l: 77.5 },  //  Data e luogo di nascita
-    '4a': { t: 85, l: 77.5 },  // Data di rilascio
+    '1': { t: 43, l: 77.5 },  // Cognome
+    '2': { t: 57, l: 77.5 },  // Nome
+    '3': { t: 71, l: 77.5 },  //  Data e luogo di nascita
+    '4a': { t: 86, l: 77.5 },  // Data di rilascio
     '4b': { t: 100, l: 77.5 }, // Data di scadenza
-    '4c': { t: 85, l: 170.0 }, // Autorità
-    '5a': { t: 99, l: 170.0 }, // Numero patente civile
+    '4c': { t: 86, l: 170.0 }, // Autorità
+    '5a': { t: 100, l: 170.0 }, // Numero patente civile
     '7': { t: 112, l: 82.5 },  // Firma
-    '5b': { t: 128, l: 77.5 },  // Numero patente di servizio
-    '9': { t: 128, l: 35 },  // Categoria
-    'photo': { t: 45.0, l: 4.0, w: 55.0, h: 67.5 } // Foto
+    '5b': { t: 130, l: 77.5 },  // Numero patente di servizio
+    '9': { t: 130, l: 35 },  // Categoria
+    'photo': { t: 45, l: 4, w: 55, h: 68 } // Foto
 };
 
 const backBoxes = {
     // Categoría I
-    'I_10': { t: 20, l: 132 },
+    'I_10': { t: 20, l: 133 },
     'I_11': { t: 20, l: 185 },
 
     // Categoría I IV
-    'I_IV_10': { t: 37, l: 132 },
+    'I_IV_10': { t: 37, l: 133 },
     'I_IV_11': { t: 37, l: 185 },
 
     // Categoría II
-    'II_10': { t: 54, l: 132 },
+    'II_10': { t: 54, l: 133 },
     'II_11': { t: 54, l: 185 },
 
     // Categoría II IV
-    'II_IV_10': { t: 72, l: 132 },
+    'II_IV_10': { t: 72, l: 133 },
     'II_IV_11': { t: 72, l: 185 },
 
     // Categoría III
-    'III_10': { t: 89, l: 132 },
+    'III_10': { t: 89, l: 133 },
     'III_11': { t: 89, l: 185 },
 
     // Categoría III IV
-    'III_IV_10': { t: 106, l: 132 },
+    'III_IV_10': { t: 106, l: 133 },
     'III_IV_11': { t: 106, l: 185 },
 };
 
 const badgeWidth = 8.602 * 28.35;
 const badgeHeight = 5.486 * 28.35;
-
-const pos = (box, isY = false) => (isY ? box.t : box.l);
 
 export const generateLicenseBuffer = async (request) => {
 
@@ -101,35 +99,104 @@ export const generateLicenseBuffer = async (request) => {
                 absolutePosition: { x: 0, y: 0 }
             },
 
-            { text: request.persona.cognome.toUpperCase(), absolutePosition: { x: pos(frontBoxes['1']), y: pos(frontBoxes['1'], true) }, fontSize: 9 },
+            {
+                text: request.persona.cognome.toUpperCase(),
+                absolutePosition: {
+                    x: frontBoxes['1'].l,
+                    y: frontBoxes['1'].t
+                },
+                fontSize: 9
+            },
 
-            { text: request.persona.nome.toUpperCase(), absolutePosition: { x: pos(frontBoxes['2']), y: pos(frontBoxes['2'], true) }, fontSize: 9 },
+            {
+                text: request.persona.nome.toUpperCase(),
+                absolutePosition: {
+                    x: frontBoxes['2'].l,
+                    y: frontBoxes['2'].t
+                },
+                fontSize: 9
+            },
 
-            { text: `${new Date(request.persona.data_nascita).toLocaleDateString('it-IT')} ${request.persona.luogo_nascita.toUpperCase()}`, absolutePosition: { x: pos(frontBoxes['3']), y: pos(frontBoxes['3'], true) }, fontSize: 9 },
+            {
+                text: `${new Date(request.persona.data_nascita).toLocaleDateString('it-IT')} ${request.persona.luogo_nascita.toUpperCase()}`,
+                absolutePosition: {
+                    x: frontBoxes['3'].l,
+                    y: frontBoxes['3'].t
+                },
+                fontSize: 9
+            },
 
-            { text: new Date(request.data_rilascio).toLocaleDateString('it-IT'), absolutePosition: { x: pos(frontBoxes['4a']), y: pos(frontBoxes['4a'], true) }, fontSize: 9 },
+            {
+                text: new Date(request.data_rilascio).toLocaleDateString('it-IT'),
+                absolutePosition: {
+                    x: frontBoxes['4a'].l,
+                    y: frontBoxes['4a'].t
+                },
+                fontSize: 9
+            },
 
-            { text: new Date(civilLicense.data_scadenza).toLocaleDateString('it-IT'), absolutePosition: { x: pos(frontBoxes['4b']), y: pos(frontBoxes['4b'], true) }, fontSize: 9 },
+            {
+                text: new Date(civilLicense.data_scadenza).toLocaleDateString('it-IT'),
+                absolutePosition: {
+                    x: frontBoxes['4b'].l,
+                    y: frontBoxes['4b'].t
+                },
+                fontSize: 9
+            },
 
-            { text: civilLicense?.autorita?.toUpperCase(), absolutePosition: { x: pos(frontBoxes['4c']), y: pos(frontBoxes['4c'], true) }, fontSize: 9 },
+            {
+                text: civilLicense?.autorita?.toUpperCase(),
+                absolutePosition: {
+                    x: frontBoxes['4c'].l,
+                    y: frontBoxes['4c'].t
+                },
+                fontSize: 9
+            },
 
-            { text: civilLicense?.numero || '', absolutePosition: { x: pos(frontBoxes['5a']), y: pos(frontBoxes['5a'], true) }, fontSize: 9 },
+            {
+                text: civilLicense?.numero || '',
+                absolutePosition: {
+                    x: frontBoxes['5a'].l,
+                    y: frontBoxes['5a'].t
+                },
+                fontSize: 9
+            },
 
-            { text: request.numero, absolutePosition: { x: pos(frontBoxes['5b']), y: pos(frontBoxes['5b'], true) }, fontSize: 9 },
+            {
+                text: request.numero,
+                absolutePosition: {
+                    x: frontBoxes['5b'].l,
+                    y: frontBoxes['5b'].t
+                },
+                fontSize: 9
+            },
 
-            { text: request.id_categoria || '', absolutePosition: { x: pos(frontBoxes['9']), y: pos(frontBoxes['9'], true) }, fontSize: 9 },
+            {
+                text: request.id_categoria || '',
+                absolutePosition: {
+                    x: frontBoxes['9'].l,
+                    y: frontBoxes['9'].t
+                },
+                fontSize: 9
+            },
 
             holderPhoto ? {
                 image: holderPhoto,
                 width: frontBoxes.photo.w,
                 height: frontBoxes.photo.h,
-                absolutePosition: { x: pos(frontBoxes.photo), y: pos(frontBoxes.photo, true) }
+                absolutePosition: {
+                    x: frontBoxes.photo.l,
+                    y: frontBoxes.photo.t
+                }
             } : {},
 
             holderSignature ? {
                 image: holderSignature,
                 width: 40,
-                absolutePosition: { x: pos(frontBoxes['7']), y: pos(frontBoxes['7'], true) }
+                absolutePosition: {
+                    x: frontBoxes['7'].l,
+                    y: frontBoxes['7'].t
+                }
             } : {},
 
             // --- RETRO ---
@@ -137,13 +204,30 @@ export const generateLicenseBuffer = async (request) => {
                 image: backBackground,
                 width: badgeWidth,
                 height: badgeHeight,
-                absolutePosition: { x: 0, y: 0 },
+                absolutePosition: {
+                    x: 0,
+                    y: 0
+                },
                 pageBreak: 'before'
             },
 
-            { text: new Date(request.data_rilascio).toLocaleDateString('it-IT'), absolutePosition: { x: pos(coords10), y: pos(coords10, true) }, fontSize: 9 },
+            {
+                text: new Date(request.data_rilascio).toLocaleDateString('it-IT'),
+                absolutePosition: {
+                    x: coords10.l,
+                    y: coords10.t
+                },
+                fontSize: 9
+            },
 
-            { text: new Date(civilLicense.data_scadenza).toLocaleDateString('it-IT'), absolutePosition: { x: pos(coords11), y: pos(coords11, true) }, fontSize: 9 }
+            {
+                text: new Date(civilLicense.data_scadenza).toLocaleDateString('it-IT'),
+                absolutePosition: {
+                    x: coords11.l,
+                    y: coords11.t
+                },
+                fontSize: 9
+            }
         ]
     };
 
