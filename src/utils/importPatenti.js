@@ -8,6 +8,9 @@ import {
 import ExcelJS from 'exceljs';
 import { globalNormalizer } from '../utils/formatters.js';
 
+const MAP_CAT = { "1": "I", "3": "II", "5": "III", "2": "I_IV", "4": "II_IV", "6": "III_IV" };
+const MAP_STATO_PAT = { "0": "IN_PREPARAZIONE", "1": "ATTIVA", "3": "ANNULLATA", "4": "REVOCATA", "5": "SCADUTA", "6": "RUBATA", "7": "SMARRITA", "8": "REVOCATA" };
+
 const run = async () => {
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.readFile('../../data/Patenti.xlsx');
@@ -30,6 +33,9 @@ const run = async () => {
 
             const clean = (val, attr) => globalNormalizer(val, attr);
 
+            const catId = MAP_CAT[row.getCell('Q').value] || clean(row.getCell('Q').value);
+            const statoId = MAP_STATO_PAT[row.getCell('S').value] || clean(row.getCell('S').value);
+
             const raw = {
                 id: row.getCell('A').value, // ID_PATENTE
                 p_civ_num: row.getCell('J').value, // PATENTE_CIVILE_NUMERO
@@ -39,9 +45,9 @@ const run = async () => {
                 p_ser_num: row.getCell('F').value, // NUMERO_PATENTE_DI_SERVIZIO
                 p_ser_ril: parseDate(row.getCell('C').value), // DATA_RILASCIO
                 p_ser_not: row.getCell('E').value, // NOTE_UFFICIO
-                cat_id: row.getCell('Q').value,    // COD_PATENTE_CATEGORIA
+                //cat_id: row.getCell('Q').value,    // COD_PATENTE_CATEGORIA
                 cat_desc: row.getCell('R').value,  // PATENTE_CATEGORIA
-                stato_id: row.getCell('S').value,  // COD_PATENTE_STATO
+                //stato_id: row.getCell('S').value,  // COD_PATENTE_STATO
                 stato_desc: row.getCell('T').value,// PATENTE_STATO
                 id_persona: row.getCell('O').value,// ID_INTESTATARIO_ANA
                 id_ente: row.getCell('L').value    // ID_ENTE
@@ -49,13 +55,13 @@ const run = async () => {
             try {
                 await sequelize.transaction(async (t) => {
                     await StatoPatente.findOrCreate({
-                        where: { id: clean(raw.stato_id) },
+                        where: { id: statoId },
                         defaults: { descrizione: clean(raw.stato_desc) },
                         transaction: t
                     });
 
                     await CategoriaPatente.findOrCreate({
-                        where: { id: clean(raw.cat_id) },
+                        where: { id: catId },
                         defaults: { descrizione: clean(raw.cat_desc) },
                         transaction: t
                     });
@@ -67,8 +73,8 @@ const run = async () => {
                         autorita: clean(raw.p_civ_aut),
                         data_scadenza: raw.p_civ_sca,
                         id_persona: raw.id_persona,
-                        id_categoria: clean(raw.cat_id),
-                        id_stato: clean(raw.stato_id)
+                        id_categoria: catId,
+                        id_stato: statoId
                     }, { transaction: t });
 
                     await PatenteServizio.upsert({
@@ -78,8 +84,8 @@ const run = async () => {
                         note_ufficio: clean(raw.p_ser_not),
                         id_persona: raw.id_persona,
                         id_ente: raw.id_ente,
-                        id_categoria: clean(raw.cat_id),
-                        id_stato: clean(raw.stato_id),
+                        id_categoria: catId,
+                        id_stato: statoId,
                         id_patentecivile: raw.id
                     }, { transaction: t });
                 });

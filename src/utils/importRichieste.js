@@ -8,6 +8,9 @@ import {
 import ExcelJS from 'exceljs';
 import { globalNormalizer } from '../utils/formatters.js';
 
+const MAP_TIPO_REQ = { "10": "NUOVA", "22": "RINNOVO", "20": "CAMBIO CATEGORIA", "34": "REVOCA GENERICA DA PARTE DELL'ENTE" };
+const MAP_STATO_REQ = { "1": "INVIATA", "4": "RESPINTA", "0": "IN_PREPARAZIONE" };
+
 const run = async () => {
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.readFile('../../data/Richieste.xlsx');
@@ -39,11 +42,14 @@ const run = async () => {
 
             const clean = (val) => globalNormalizer(val);
 
+            const tipoId = MAP_TIPO_REQ[row.getCell('X').value] || clean(row.getCell('X').value);
+            const statoId = MAP_STATO_REQ[row.getCell('AA').value] || clean(row.getCell('AA').value);
+
             const raw = {
                 id: row.getCell('A').value,
                 cf: clean(row.getCell('B').value),
                 data_richiesta: parseDate(row.getCell('G').value),
-                tipo_id: clean(row.getCell('X').value),
+                //tipo_id: clean(row.getCell('X').value),
                 tipo_desc: clean(row.getCell('Y').value),
                 note_req: clean(row.getCell('J').value),
                 note_off: clean(row.getCell('K').value),
@@ -51,20 +57,20 @@ const run = async () => {
                 cod_resp: clean(row.getCell('O').value),
                 id_ente: row.getCell('P').value,
                 id_patente_civile: row.getCell('T').value,
-                stato_id: clean(row.getCell('AA').value),
+                //stato_id: clean(row.getCell('AA').value),
                 stato_desc: clean(row.getCell('AB').value)
             };
 
             try {
                 await sequelize.transaction(async (t) => {
                     await TipoRichiesta.findOrCreate({
-                        where: { id: raw.tipo_id },
+                        where: { id: tipoId },
                         defaults: { descrizione: raw.tipo_desc },
                         transaction: t
                     });
 
                     await StatoRichiesta.findOrCreate({
-                        where: { id: raw.stato_id },
+                        where: { id: statoId },
                         defaults: { descrizione: raw.stato_desc },
                         transaction: t
                     });
@@ -83,8 +89,8 @@ const run = async () => {
                         numero_richiesta_ente: raw.num_rich_ente || 0,
                         id_persona: persona ? persona.id : null,
                         id_ente: raw.id_ente,
-                        id_tipo: raw.tipo_id,
-                        id_stato: raw.stato_id,
+                        id_tipo: tipoId,
+                        id_stato: statoId,
                         id_patentecivile: raw.id_patente_civile
                     }, { transaction: t });
                 });
