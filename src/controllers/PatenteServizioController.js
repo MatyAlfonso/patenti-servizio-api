@@ -53,7 +53,7 @@ export const issue = async (req, res) => {
         const newSq = (entity.sq_patenti || 0) + 1;
         const formattedSq = newSq.toString().padStart(4, '0');
         const prefix = request.id_ente === 'PCR' ? 'PC' : 'CF';
-        const fullLicenseNumber = `${prefix} ${formattedSq}`;
+        const fullLicenseNumber = `${prefix}${formattedSq}`;
 
         const civilLicense = request.persona.patente_civile[0];
         if (!civilLicense) throw new Error("Dati patente civile non trovati per esta persona");
