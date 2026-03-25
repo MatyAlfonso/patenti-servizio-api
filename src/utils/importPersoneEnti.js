@@ -3,7 +3,7 @@ import { importExcelToModel } from '../services/excelImporter.js';
 import { globalNormalizer } from './formatters.js';
 import * as Mappings from './mapping.js';
 
-const { sequelize, Persona, Ente, PatenteServizio, Richiesta } = Models;
+const { sequelize, Persona, Ente } = Models;
 
 const importConfigs = [
     {
@@ -18,14 +18,6 @@ const importConfigs = [
         mapping: Mappings.mappingEnti,
         file: '../../data/Enti.xlsx'
     },
-    /*
-    { 
-        name: 'Richieste', 
-        model: Richiesta, 
-        mapping: Mappings.mappingRichieste, 
-        file: '../../data/Richieste.xlsx' 
-    }
-    */
 ];
 
 const runAll = async () => {
