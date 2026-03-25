@@ -36,3 +36,6 @@ database.sqlite
 # Uploads
 uploads/
 src/assets/templates
+
+#Excel data
+data/
