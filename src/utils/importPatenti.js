@@ -9,7 +9,7 @@ import ExcelJS from 'exceljs';
 import { globalNormalizer } from '../utils/formatters.js';
 
 const MAP_CAT = { "1": "I", "3": "II", "5": "III", "2": "I_IV", "4": "II_IV", "6": "III_IV" };
-const MAP_STATO_PAT = { "0": "IN_PREPARAZIONE", "1": "ATTIVA", "3": "ANNULLATA", "4": "REVOCATA", "5": "SCADUTA", "6": "RUBATA", "7": "SMARRITA", "8": "REVOCATA" };
+const MAP_STATO_PAT = { "0": "IN_PREPARAZIONE", "1": "ATTIVA", "2":"SOSPESA", "3": "ANNULLATA", "4": "REVOCATA", "5": "SCADUTA", "6": "RUBATA", "7": "SMARRITA", "8": "REVOCATA" };
 
 const run = async () => {
     const workbook = new ExcelJS.Workbook();
