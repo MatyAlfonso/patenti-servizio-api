@@ -23,35 +23,35 @@ const frontBoxes = {
     '4c': { t: 86, l: 170.0 }, // Autorità
     '5a': { t: 100, l: 170.0 }, // Numero patente civile
     '7': { t: 112, l: 82.5 },  // Firma
-    '5b': { t: 130, l: 77.5 },  // Numero patente di servizio
-    '9': { t: 130, l: 35 },  // Categoria
-    'photo': { t: 45, l: 4, w: 55, h: 68 } // Foto
+    '5b': { t: 129, l: 77.5 },  // Numero patente di servizio
+    '9': { t: 129, l: 35 },  // Categoria
+    'photo': { t: 45, l: 4.5, w: 55, h: 68 } // Foto
 };
 
 const backBoxes = {
     // Categoría I
-    'I_10': { t: 20, l: 133 },
-    'I_11': { t: 20, l: 185 },
+    'I_10': { t: 20, l: 131 },
+    'I_11': { t: 20, l: 183 },
 
     // Categoría I IV
-    'I_IV_10': { t: 37, l: 133 },
-    'I_IV_11': { t: 37, l: 185 },
+    'I_IV_10': { t: 37, l: 131 },
+    'I_IV_11': { t: 37, l: 183 },
 
     // Categoría II
-    'II_10': { t: 54, l: 133 },
-    'II_11': { t: 54, l: 185 },
+    'II_10': { t: 54, l: 131 },
+    'II_11': { t: 54, l: 183 },
 
     // Categoría II IV
-    'II_IV_10': { t: 72, l: 133 },
-    'II_IV_11': { t: 72, l: 185 },
+    'II_IV_10': { t: 72, l: 131 },
+    'II_IV_11': { t: 72, l: 183 },
 
     // Categoría III
-    'III_10': { t: 89, l: 133 },
-    'III_11': { t: 89, l: 185 },
+    'III_10': { t: 89, l: 131 },
+    'III_11': { t: 89, l: 183 },
 
     // Categoría III IV
-    'III_IV_10': { t: 106, l: 133 },
-    'III_IV_11': { t: 106, l: 185 },
+    'III_IV_10': { t: 106, l: 131 },
+    'III_IV_11': { t: 106, l: 183 },
 };
 
 const badgeWidth = 8.602 * 28.35;
@@ -76,8 +76,8 @@ export const generateLicenseBuffer = async (request) => {
     const coords10 = backBoxes[`${request.id_categoria}_10`];
     const coords11 = backBoxes[`${request.id_categoria}_11`];
 
-    const frontBackground = imgToBase64(path.join(__dirname, '../assets/templates/Fronte_finale.jpg'));
-    const backBackground = imgToBase64(path.join(__dirname, '../assets/templates/Retro_finale.jpg'));
+    const frontBackground = imgToBase64(path.join(__dirname, '../assets/templates/fronte.jpg'));
+    const backBackground = imgToBase64(path.join(__dirname, '../assets/templates/retro.jpg'));
 
     const holderPhoto = imgToBase64(request.fototessera?.path);
     const holderSignature = imgToBase64(request.firma_scansionata?.path);
