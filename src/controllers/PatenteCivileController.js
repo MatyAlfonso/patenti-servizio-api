@@ -48,7 +48,7 @@ export const update = async (req, res) => {
         if (id_stato !== 'ATTIVA') {
             await PatenteServizio.update(
                 {
-                    id_stato: 'SOSPESA',
+                    id_stato,
                     note: `Inabilitata automaticamente: patente civile in stato ${id_stato}`
                 },
                 {
