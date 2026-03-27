@@ -13,6 +13,8 @@ export const create = async (req, res) => {
     try {
         const dataToCreate = {
             ...req.body,
+            id: req.body.id.toUpperCase(),
+            descrizione: req.body.descrizione.toUpperCase(),
             sq_richieste: 0,
             sq_patenti: 0
         };

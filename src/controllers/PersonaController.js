@@ -11,7 +11,15 @@ export const getAll = async (req, res) => {
 
 export const create = async (req, res) => {
     try {
-        const newPerson = await Persona.create(req.body);
+        const dataToCreate = {
+            ...req.body,
+            cognome: req.body.cognome.toUpperCase(),
+            nome: req.body.nome.toUpperCase(),
+            codice_fiscale: req.body.codice_fiscale.toUpperCase(),
+            luogo_nascita: req.body.luogo_nascita.toUpperCase(),
+        }
+
+        const newPerson = await Persona.create(dataToCreate);
         res.status(201).json(newPerson);
     } catch (error) {
         res.status(400).json({ error: error.message });

@@ -29,6 +29,21 @@ export const create = async (req, res) => {
             patente_civile_numero, patente_civile_categorie, patente_civile_autorita, patente_civile_rilascio, patente_civile_scadenza
         } = req.body;
 
+        const existingRequest = await Richiesta.findOne({
+            where: {
+                id_persona,
+                id_stato: ['IN_PREPARAZIONE']
+            },
+            transaction
+        });
+
+        if (existingRequest) {
+            await transaction.rollback();
+            return res.status(400).json({
+                error: "Esiste già una richiesta in corso per questa persona."
+            });
+        }
+
         const entity = await Ente.findByPk(id_ente, { transaction });
         if (!entity) throw new Error("Ente non trovato");
 
@@ -85,7 +100,7 @@ export const create = async (req, res) => {
             id_ente,
             id_tipo,
             id_stato,
-            residenza_persona,
+            residenza_persona: residenza_persona.toUpperCase(),
             note_richiedente,
             id_foto: photoId,
             id_firma: signatureId,
@@ -151,9 +166,9 @@ export const update = async (req, res) => {
 
         if (civilLicense) {
             await civilLicense.update({
-                numero: data.patente_civile_numero,
+                numero: data.patente_civile_numero.toUpperCase(),
                 id_categoria: data.patente_civile_categorie,
-                autorita: data.patente_civile_autorita,
+                autorita: data.patente_civile_autorita.toUpperCase(),
                 data_rilascio: data.patente_civile_rilascio,
                 data_scadenza: data.patente_civile_scadenza
             }, { transaction });
