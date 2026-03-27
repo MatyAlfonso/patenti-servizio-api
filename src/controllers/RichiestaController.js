@@ -44,34 +44,37 @@ export const create = async (req, res) => {
             });
         }
 
+        const currentActiveLicense = await PatenteCivile.findOne({
+            where: { id_persona, id_stato: 'ATTIVA' },
+            transaction
+        });
+
+        if (id_tipo === 'NUOVA') {
+            if (currentActiveLicense) {
+                await transaction.rollback();
+                return res.status(400).json({ error: "La persona ha già una patente attiva. Usa 'Rinnovo'." });
+            }
+        } else if (id_tipo === 'RINNOVO') {
+            if (currentActiveLicense) {
+                await currentActiveLicense.update({ id_stato: 'SCADUTA' }, { transaction });
+            }
+        }
+
+        await PatenteCivile.create({
+            id_persona,
+            numero: patente_civile_numero.toUpperCase(),
+            data_rilascio: patente_civile_rilascio,
+            data_scadenza: patente_civile_scadenza,
+            id_categoria: patente_civile_categorie,
+            id_stato: 'ATTIVA',
+            autorita: patente_civile_autorita.toUpperCase()
+        }, { transaction });
+
         const entity = await Ente.findByPk(id_ente, { transaction });
         if (!entity) throw new Error("Ente non trovato");
 
         const newSequence = (entity.sq_richieste || 0) + 1;
         await entity.update({ sq_richieste: newSequence }, { transaction });
-
-        const [civilLicense, created] = await PatenteCivile.findOrCreate({
-            where: { id_persona: id_persona },
-            defaults: {
-                numero: patente_civile_numero,
-                data_rilascio: patente_civile_rilascio,
-                data_scadenza: patente_civile_scadenza,
-                id_categoria: patente_civile_categorie,
-                id_stato: 'ATTIVA',
-                autorita: patente_civile_autorita
-            },
-            transaction
-        });
-
-        if (!created) {
-            await civilLicense.update({
-                numero: patente_civile_numero,
-                data_rilascio: patente_civile_rilascio,
-                data_scadenza: patente_civile_scadenza,
-                id_categoria: patente_civile_categorie,
-                autorita: patente_civile_autorita
-            }, { transaction });
-        }
 
         let photoId = null;
         let signatureId = null;
@@ -132,11 +135,11 @@ export const update = async (req, res) => {
         }
 
         await request.update({
-            id_ente: data.id_ente,
-            id_tipo: data.id_tipo,
-            id_stato: data.id_stato,
-            residenza_persona: data.residenza_persona,
-            note_richiedente: data.note_richiedente
+            id_ente: data.id_ente || request.id_ente,
+            id_tipo: data.id_tipo || request.id_tipo,
+            id_stato: data.id_stato || request.id_stato,
+            residenza_persona: data.residenza_persona ? data.residenza_persona.toUpperCase() : request.residenza_persona,
+            note_richiedente: data.note_richiedente || request.note_richiedente
         }, { transaction });
 
         if (req.files?.fototessera) {
@@ -159,25 +162,31 @@ export const update = async (req, res) => {
             await request.update({ id_firma: newSignature.id }, { transaction });
         }
 
-        const civilLicense = await PatenteCivile.findOne({
-            where: { id_persona: request.id_persona },
-            transaction
-        });
+        if (data.patente_civile_numero) {
+            const civilLicense = await PatenteCivile.findOne({
+                where: {
+                    id_persona: request.id_persona,
+                    id_stato: 'ATTIVA'
+                },
+                transaction
+            });
 
-        if (civilLicense) {
-            await civilLicense.update({
-                numero: data.patente_civile_numero.toUpperCase(),
-                id_categoria: data.patente_civile_categorie,
-                autorita: data.patente_civile_autorita.toUpperCase(),
-                data_rilascio: data.patente_civile_rilascio,
-                data_scadenza: data.patente_civile_scadenza
-            }, { transaction });
+            if (civilLicense) {
+                await civilLicense.update({
+                    numero: data.patente_civile_numero.toUpperCase(),
+                    id_categoria: data.patente_civile_categorie || civilLicense.id_categoria,
+                    autorita: data.patente_civile_autorita ? data.patente_civile_autorita.toUpperCase() : civilLicense.autorita,
+                    data_rilascio: data.patente_civile_rilascio || civilLicense.data_rilascio,
+                    data_scadenza: data.patente_civile_scadenza || civilLicense.data_scadenza
+                }, { transaction });
+            }
         }
 
         await transaction.commit();
         res.json({ message: "Richiesta aggiornata correttamente" });
     } catch (error) {
         if (transaction) await transaction.rollback();
+        console.error("Error in update:", error);
         res.status(500).json({ error: error.message });
     }
 };
@@ -231,7 +240,7 @@ export const remove = async (req, res) => {
         }
 
         const issuedLicense = await PatenteServizio.findOne({
-            where: { id_persona: request.id_persona, id_ente: request.id_ente },
+            where: { id_persona: request.id_persona, id_ente: request.id_ente, id_stato: 'ATTIVA' },
             transaction
         });
 
@@ -240,21 +249,7 @@ export const remove = async (req, res) => {
             return res.status(400).json({ error: "Non si può eliminare: una patente di servizio è già stata emessa." });
         }
 
-        const personId = request.id_persona;
-
         await request.destroy({ transaction });
-
-        const remainingRequestsCount = await Richiesta.count({
-            where: { id_persona: personId },
-            transaction
-        });
-
-        if (remainingRequestsCount === 0) {
-            await PatenteCivile.destroy({
-                where: { id_persona: personId },
-                transaction
-            });
-        }
 
         await transaction.commit();
         res.json({ message: "Richiesta eliminata correttamente" });

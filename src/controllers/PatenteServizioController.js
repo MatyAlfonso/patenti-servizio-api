@@ -48,6 +48,19 @@ export const issue = async (req, res) => {
         if (!request) throw new Error("Richiesta non trovata");
         if (request.id_stato === 'INVIATA') throw new Error("Richiesta già processata");
 
+        const oldActiveLicense = await PatenteServizio.findOne({
+            where: {
+                id_persona: request.id_persona,
+                id_ente: request.id_ente,
+                id_stato: 'ATTIVA'
+            },
+            transaction
+        });
+
+        if (oldActiveLicense) {
+            await oldActiveLicense.update({ id_stato: 'SCADUTA' }, { transaction });
+        }
+
         const entity = await Ente.findByPk(request.id_ente, { transaction });
         
         const newSq = (entity.sq_patenti || 0) + 1;
@@ -55,8 +68,10 @@ export const issue = async (req, res) => {
         const prefix = request.id_ente === 'PCR' ? 'PC' : 'CF';
         const fullLicenseNumber = `${prefix}${formattedSq}`;
 
-        const civilLicense = request.persona.patente_civile[0];
-        if (!civilLicense) throw new Error("Dati patente civile non trovati per esta persona");
+        const civilLicense = request.persona.patente_civile.find(p => p.id_stato === 'ATTIVA')
+            || request.persona.patente_civile[0];
+
+        if (!civilLicense) throw new Error("Dati patente civile non trovati per questa persona");
 
         const newLicense = await PatenteServizio.create({
             id_persona: request.id_persona,
