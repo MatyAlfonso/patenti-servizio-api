@@ -17,6 +17,7 @@
     "exceljs": "^4.4.0",
     "express": "^5.1.0",
     "multer": "^2.1.1",
+    "node-cron": "^4.2.1",
     "pdfmake": "^0.2.7",
     "sequelize": "^6.37.8",
     "sqlite3": "^5.1.7"
