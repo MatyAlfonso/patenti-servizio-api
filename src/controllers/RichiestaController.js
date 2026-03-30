@@ -55,9 +55,11 @@ export const create = async (req, res) => {
                 return res.status(400).json({ error: "La persona ha già una patente attiva. Usa 'Rinnovo'." });
             }
         } else if (id_tipo === 'RINNOVO') {
-            if (currentActiveLicense) {
-                await currentActiveLicense.update({ id_stato: 'SCADUTA' }, { transaction });
+            if (!currentActiveLicense) {
+                await transaction.rollback();
+                return res.status(400).json({ error: "Impossibile rinnovare: nessuna patente attiva trovata." });
             }
+            await currentActiveLicense.update({ id_stato: 'SCADUTA' }, { transaction });
         }
 
         await PatenteCivile.create({

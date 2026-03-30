@@ -1,8 +1,16 @@
-import { Persona } from '../models/index.js';
+import { Persona, PatenteCivile } from '../models/index.js';
 
 export const getAll = async (req, res) => {
     try {
-        const people = await Persona.findAll();
+        const people = await Persona.findAll({
+            include: [{
+                model: PatenteCivile,
+                as: 'patente_civile',
+                where: { id_stato: 'ATTIVA' },
+                required: false
+            }],
+            order: [['cognome', 'ASC'], ['nome', 'ASC']]
+        });
         res.json(people);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -33,7 +41,13 @@ export const update = async (req, res) => {
 
         if (!person) return res.status(404).json({ error: "Persona non trovata" });
 
-        await person.update(req.body);
+        const dataToUpdate = { ...req.body };
+        if (dataToUpdate.cognome) dataToUpdate.cognome = dataToUpdate.cognome.toUpperCase();
+        if (dataToUpdate.nome) dataToUpdate.nome = dataToUpdate.nome.toUpperCase();
+        if (dataToUpdate.codice_fiscale) dataToUpdate.codice_fiscale = dataToUpdate.codice_fiscale.toUpperCase();
+        if (dataToUpdate.luogo_nascita) dataToUpdate.luogo_nascita = dataToUpdate.luogo_nascita.toUpperCase();
+
+        await person.update(dataToUpdate);
         res.json(person);
     } catch (error) {
         res.status(400).json({ error: "Errore: Codice Fiscale già esistente o dati non validi." });
