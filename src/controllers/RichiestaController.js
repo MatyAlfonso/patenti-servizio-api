@@ -49,16 +49,16 @@ export const create = async (req, res) => {
             transaction
         });
 
-        if (id_tipo === 'NUOVA') {
-            if (currentActiveLicense) {
-                await transaction.rollback();
-                return res.status(400).json({ error: "La persona ha già una patente attiva. Usa 'Rinnovo'." });
-            }
-        } else if (id_tipo === 'RINNOVO') {
-            if (!currentActiveLicense) {
-                await transaction.rollback();
-                return res.status(400).json({ error: "Impossibile rinnovare: nessuna patente attiva trovata." });
-            }
+        if (id_tipo === 'NUOVA' && currentActiveLicense) {
+            await transaction.rollback();
+            return res.status(400).json({ error: "La persona ha già una patente attiva. Usa 'Rinnovo'." });
+        }
+        if (id_tipo === 'RINNOVO' && !currentActiveLicense) {
+            await transaction.rollback();
+            return res.status(400).json({ error: "Impossibile rinnovare: nessuna patente attiva trovata." });
+        }
+
+        if (id_tipo === 'RINNOVO' && currentActiveLicense) {
             await currentActiveLicense.update({ id_stato: 'SCADUTA' }, { transaction });
         }
 
@@ -134,6 +134,17 @@ export const update = async (req, res) => {
         if (!request) {
             await transaction.rollback();
             return res.status(404).json({ error: "Richiesta non trovata" });
+        }
+
+        if (data.id_tipo && data.id_tipo !== request.id_tipo) {
+            const activeLicense = await PatenteCivile.findOne({
+                where: { id_persona: request.id_persona, id_stato: 'ATTIVA' },
+                transaction
+            });
+            if (data.id_tipo === 'NUOVA' && activeLicense) {
+                await transaction.rollback();
+                return res.status(400).json({ error: "Non puoi cambiare in 'Nuova': esiste già una patente attiva." });
+            }
         }
 
         await request.update({
@@ -239,16 +250,6 @@ export const remove = async (req, res) => {
         if (!request) {
             await transaction.rollback();
             return res.status(404).json({ error: "Richiesta non trovata" });
-        }
-
-        const issuedLicense = await PatenteServizio.findOne({
-            where: { id_persona: request.id_persona, id_ente: request.id_ente, id_stato: 'ATTIVA' },
-            transaction
-        });
-
-        if (issuedLicense) {
-            await transaction.rollback();
-            return res.status(400).json({ error: "Non si può eliminare: una patente di servizio è già stata emessa." });
         }
 
         await request.destroy({ transaction });
