@@ -71,7 +71,7 @@ const run = async () => {
 
                     await StatoRichiesta.findOrCreate({
                         where: { id: statoId },
-                        defaults: { descrizione: raw.stato_desc },
+                        defaults: { descrizione: statoId === "IN_PREPARAZIONE" ? "IN PREPARAZIONE" : raw.stato_desc },
                         transaction: t
                     });
 
