@@ -26,11 +26,42 @@ export const getAll = async (req, res) => {
 };
 
 export const create = async (req, res) => {
+    const transaction = await sequelize.transaction();
     try {
-        const newLicense = await PatenteCivile.create(req.body);
-        res.status(201).json(newLicense);
+        const { id_persona, numero, id_categoria, autorita, data_rilascio, data_scadenza } = req.body;
+
+        const existingActive = await PatenteCivile.findOne({
+            where: { id_persona, id_stato: 'ATTIVA' },
+            transaction
+        });
+
+        if (existingActive) {
+            await transaction.rollback();
+            return res.status(400).json({
+                error: "Questa persona ha già una patente civile attiva nel sistema."
+            });
+        }
+
+        const newLicense = await PatenteCivile.create({
+            id_persona,
+            numero: numero.toUpperCase(),
+            id_categoria,
+            autorita: autorita.toUpperCase(),
+            data_rilascio,
+            data_scadenza,
+            id_stato: 'ATTIVA'
+        }, { transaction });
+
+        await transaction.commit();
+
+        const fullLicense = await PatenteCivile.findByPk(newLicense.id, {
+            include: ['persona', 'categoria', 'stato']
+        });
+
+        res.status(201).json(fullLicense);
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        if (transaction) await transaction.rollback();
+        res.status(500).json({ error: error.message });
     }
 };
 
